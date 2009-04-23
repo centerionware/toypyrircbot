@@ -1,0 +1,17 @@
+(lp0
+(lp1
+S':!learning'
+p2
+aS'I can learn and unlearn stuff, send !commands for a list of everything ops have taught me! (Example: !learn learning I can learn.....)'
+p3
+aa(lp4
+S':!test'
+p5
+aS'output'
+p6
+aa(lp7
+S':!spam'
+p8
+aS'Spam is not allowed! Stop it now or get banned!'
+p9
+aa.
