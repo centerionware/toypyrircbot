@@ -34,8 +34,8 @@ class Bot:
 	def __init__(self):
 		self.HOST='irc.ubuntu.com' #The server we want to connect to
 		self.PORT=8001 #The connection port which is usually 6667
-		self.NICK='Bots-Nick' #The bot's nickname
-		self.PASS='Bots-Pass' # If the nick is registered with nickserv
+		self.NICK='Bot-Nick' #The bot's nickname
+		self.PASS='Bot-Pass' # If the nick is registered with nickserv
 		self.IDENT='pybot'
 		self.REALNAME='s1ash'
 		self.OWNER='OxDeadC0de' #The bot owner's nick
@@ -208,8 +208,14 @@ class Bot:
 		j.close()
 
 	def sendm(self, msg): 
+		if msg.find("ACTION") == 0:
+		#	msg = msg[1:]
+			msg = '\001'+msg+'\001'#msg.replace("\\001", "\u0001")
+		if msg.find("/me ") == 0:
+			msg = msg[3:]
+			msg = '\001ACTION'+msg+'\001'#msg.replace("\\001", "\u0001")
 		self.sock.send('PRIVMSG '+ self.channel + ' :' + str(msg) + '\r\n')
-		#print "Sending: " + 'PRIVMSG '+ self.channel + ' :' + str(msg) 
+		print "Sending: " + 'PRIVMSG '+ self.channel + ' :' + str(msg) 
 
 	def removeone(self, one):
 		self.jobs.remove(one)
@@ -287,6 +293,13 @@ class Bot:
 				#print 'Joining channel: %s' % rest
 				self.sock.send('JOIN %s\r\n' % rest) 
 				self.joinChannel(rest)
+	def nickChange(self, text):
+		if(text.find(":!nick ") != -1):
+			rest = text[text.find(":!nick ")+6:]
+			rest = rest.strip()
+			submitter = self.getSubmitter(text)
+			if(submitter == self.OWNER):
+				self.sock.send('NICK %s\r\n' % rest)
 	def ping(self, text):
 		if text.find('PING') == 0: 
 			self.sock.send('PONG ' + text.split() [1] + '\r\n')
@@ -380,6 +393,7 @@ class Bot:
 			for ignored in self.banned:
 				ignoredusers = ignoredusers + " " + ignored
 			self.sendm("Ignored users: " + ignoredusers)
+
 	def ignore(self, text):
 		if text.find(':!ignore ') != -1 and text.find(":!ignored") == -1:
 			submitter = text[text.find(":")+1:text.find("!n")]
@@ -460,7 +474,7 @@ class Bot:
 		self.ignore( text )
 		self.unignore( text )
 		self.mainJob( text )
-
+		self.nickChange( text )	
 	
 	def main(self ):	
 		
