@@ -25,6 +25,7 @@ import random
 import time
 import urllib
 import urllib2
+import re
 
 def sorter(a, b):
 	return cmp(len(b[0]), len(a[0]))
@@ -33,8 +34,8 @@ class Bot:
 	def __init__(self):
 		self.HOST='irc.ubuntu.com' #The server we want to connect to
 		self.PORT=8001 #The connection port which is usually 6667
-		self.NICK='BOT-USER' #The bot's nickname
-		self.PASS='BOT-PASS'
+		self.NICK='Bots-Nick' #The bot's nickname
+		self.PASS='Bots-Pass' # If the nick is registered with nickserv
 		self.IDENT='pybot'
 		self.REALNAME='s1ash'
 		self.OWNER='OxDeadC0de' #The bot owner's nick
@@ -163,7 +164,6 @@ class Bot:
 
 	def joinChannel(self, channel):
 		# Get list of ops:
-
 		output = "names " + channel
 		self.sock.send(output)
 		self.lastJoin = channel
@@ -241,7 +241,8 @@ class Bot:
 					self.ops.append([nick, self.lastJoin])
 
 	def addOp(self, text):
-		if text.find(':ChanServ!ChanServ@services. MODE #php-freelance +o') == 0 or text.find(':ChanServ!ChanServ@services. MODE #php-freelance +o') == 1: 
+		if re.match(':ChanServ!ChanServ@services\. MODE (.*) \+o', text): 
+			print "adding op!"
 			name = text[text.find("+o")+3:]
 			name = name.strip();
 			if(not self.isOp(name)):
@@ -249,7 +250,7 @@ class Bot:
 				#print "Adding op " + name + " " + self.channel
 
 	def remOp(self, text):
-		if text.find(':ChanServ!ChanServ@services. MODE #php-freelance -o') == 0 or text.find(':ChanServ!ChanServ@services. MODE #php-freelance -o')== 1:
+		if re.match(':ChanServ!ChanServ@services\. MODE (.*) \-o', text):#text.find(':ChanServ!ChanServ@services. MODE #php-freelance -o') == 0 or text.find(':ChanServ!ChanServ@services. MODE #php-freelance -o')== 1:
 			remOp = None
 			name = text[text.find("-o")+3:]
 			name = name.strip();
@@ -262,8 +263,8 @@ class Bot:
 				#print "Removing op " + name
 
 	def google(self, text):
-		if(text.find("google: ") != -1):
-			rest = text[text.find("google: ")+8:]
+		if(text.find("google ") != -1):
+			rest = text[text.find("google ")+7:]
 			rest = rest.strip()
 			temp = { 'q':rest }
 			if(len(rest) > 0): 
