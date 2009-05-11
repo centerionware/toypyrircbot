@@ -61,13 +61,16 @@ class Bot:
 		self.unlearn(text)
 		self.alllearned(text)
 		for l in self.learned:
-
 			if( text.find(l[0]) != -1):
 				rest = self.getRest(text, l[0])
 				rest.strip()
-				if(rest is not ""):
-					rest = rest + ": "
-				self.sendm(rest + l[1])
+				learned = l[1]
+				if learned.find("/me") == 0 or learned.find("ACTION") == 0:
+					self.sendm(l[1] + " " + rest)
+				else:
+					if(rest is not ""):
+						rest = rest + ": "
+					self.sendm(rest + l[1])
 				return 1
 
 		return 0
